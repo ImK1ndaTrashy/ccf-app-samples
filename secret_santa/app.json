@@ -1,0 +1,93 @@
+{
+  "endpoints": {
+    "/": {
+      "get": {
+        "js_module": "endpoints/santa.js",
+        "js_function": "homepage",
+        "mode": "readonly",
+        "forwarding_required": "sometimes",
+        "authn_policies": ["no_auth"],
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": "application/xhtml+xml"
+            }
+          }
+        }
+      }
+    },
+
+    "/jwt": {
+      "get": {
+        "js_module": "endpoints/santa.js",
+        "js_function": "homepage_jwt",
+        "mode": "readonly",
+        "forwarding_required": "sometimes",
+        "authn_policies": ["jwt"],
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": "application/json"
+            }
+          }
+        }
+      }
+    },
+
+    "/jwt/create": {
+      "post": {
+        "js_module": "endpoints/santa.js",
+        "js_function": "create_jwt",
+        "mode": "readonly",
+        "forwarding_required": "sometimes",
+        "authn_policies": ["jwt"],
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": "application/json"
+            }
+          }
+        }
+      }
+    },
+
+    "/join/{group_id}": {
+      "get": {
+        "js_module": "endpoints/santa.js",
+        "js_function": "join",
+        "mode": "readonly",
+        "forwarding_required": "sometimes",
+        "authn_policies": ["no_auth"],
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": "application/xhtml+xml"
+            }
+          }
+        }
+      }
+    },
+
+    "/jwt/join/{group_id}": {
+      "post": {
+        "js_module": "endpoints/santa.js",
+        "js_function": "join_jwt",
+        "mode": "readonly",
+        "forwarding_required": "sometimes",
+        "authn_policies": ["jwt"],
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": "application/json"
+            }
+          }
+        }
+      }
+    }
+  }
+}
