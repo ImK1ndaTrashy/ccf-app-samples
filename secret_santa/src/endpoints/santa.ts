@@ -72,6 +72,9 @@ function page_template(javascript, html) {
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <a class="navbar-brand" href="/">Confidential Secret Santa</a>
   <div class="btn-group ml-auto dropleft">
+    <button id="CreateGroup" class="btn btn-primary" id="createGroup" onclick="createGroup()" hidden="true">
+      Create Group
+    </button>
     <button type="button" id="SignIn" class="btn btn-secondary" onclick="signIn()">
       Sign In
     </button>
@@ -242,20 +245,56 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
   const html = `
 <div class="row" style="margin:auto">
   <div id="card-div" class="col-md-3" style="display:none">
-    <div class="card text-center">
+    <div class="card text-left">
       <div class="card-body">
         <h5 class="card-title" id="WelcomeMessage">Please sign-in to register and see who you should buy a gift for.</h5>
-        <div id="profile-div"></div>
-        <br>
-        <br>
-        <button class="btn btn-primary" id="seeProfile" onclick="seeProfile()">See Profile</button>
-        <button class="btn btn-primary" id="createGroup" onclick="createGroup()">Create Group</button>
+        <div id="profile-div"><p/></div>
       </div>
     </div>
   </div>
 </div>`;
 
   const javascript = `
+  // Select DOM elements to work with
+  const welcomeDiv = document.getElementById("WelcomeMessage");
+  const cardDiv = document.getElementById("card-div");
+  const profileButton = document.getElementById("seeProfile");
+  const createGroupButton = document.getElementById("CreateGroup");
+  const profileDiv = document.getElementById("profile-div");
+
+  async function updateUI(data) {
+    const new_body = document.createElement("p");
+    for (var i in data.groups) {
+      var group = data.groups[i];
+      var groupCard = document.createElement("div");
+      groupCard.className = "card text-left";
+      var groupP = document.createElement("div");
+      groupP.className = "card-body";
+      groupCard.appendChild(groupP);
+
+      groupP.innerHTML = "<h5 class='card-title'>" + group.name + "</h5>";
+      for (var j in group.members) {
+        var memberLI = document.createElement("li");
+        var member = group.members[j];
+        var memberEntry = memberLI;
+        if (member.buying)
+        {
+          memberEntry = document.createElement("strong");
+          memberLI.appendChild(memberEntry);
+        }
+        memberEntry.innerHTML = member.name + " (" + member.email + ")" + (member.buying ? " <-- buy for" : "");
+        groupP.appendChild(memberLI);
+      }
+      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primary' onclick='createLink(this.id)'>Copy Link</button>";
+      new_body.appendChild(groupCard);
+    }
+    cardDiv.appendChild(new_body);
+  }
+
+  function createLink(id) {
+    navigator.clipboard.writeText("Link:" + id);
+  }
+
   async function seeProfile() {
     let ccfEndpoint = "https://localhost:8000/app/jwt";
 
@@ -274,7 +313,6 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         // Using idToken as this is the JWT, don't use AccessToken as this is
         // not acceptable to CCF.
         callCCF(ccfEndpoint, "GET", response.idToken, updateUI);
-        profileButton.style.display = "none";
     }
   }
 
@@ -289,6 +327,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
  
         function updateUI(data, endpoint) {
           const name = document.createElement("p");
+          name.id = "p-" + data.group;
           name.innerHTML = "<strong>Group: </strong>" + data.group + "<button class='btn btn-primary' id='" + data.group + "' onclick='joinGroup(this.id)'>Join Group</button>";
           profileDiv.appendChild(name);
         }
@@ -311,6 +350,15 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
       function updateUI(data, endpoint) {
         var button = document.getElementById(group_id);
         button.style.display = "none";
+
+        var paragraph = document.getElementById("p-" + group_id);
+        for (var i in data.members)
+        {
+          const members = document.createElement("p");
+          let user = data.members[i];
+          members.innerHTML = user.name + " (" + user.email + ")";
+          paragraph.appendChild(members);
+        }
       }
 
       // Using idToken as this is the JWT, don't use AccessToken as this is
@@ -319,17 +367,28 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
     }
   }
 
-  // Select DOM elements to work with
-  const welcomeDiv = document.getElementById("WelcomeMessage");
-  const cardDiv = document.getElementById("card-div");
-  const profileButton = document.getElementById("seeProfile");
-  const createGroupButton = document.getElementById("createGroup");
-  const profileDiv = document.getElementById("profile-div");
-
   function onLogin() {
       // Reconfiguring DOM elements
       cardDiv.style.display = "initial";
       welcomeDiv.innerHTML = "Welcome to Secret Santa";
+
+      createGroupButton.hidden = false;
+      //seeProfile();
+      updateUI(
+        {groups: [
+          {
+            name: "Foo",
+            members: [
+              {name: "Matt", email: "foo@bar", buying: false},
+              {name: "Adam", email: "bar@foo", buying: true},
+              {name: "Lisa", email: "cllr@foo", buying: false},
+            ] 
+          },
+          {
+            name: "Bar",
+            members: []
+          }
+        ]});
   }`;
 
   return {
@@ -346,12 +405,12 @@ let access_count = ccfapp.typedKv("access_count", ccfapp.string, ccfapp.uint32);
 export function homepage_jwt(request: ccfapp.Request): ccfapp.Response {
   return check_jwt(request, function (jwt: ccfapp.JwtAuthnIdentity, params) {
     var payload = jwt.jwt.payload;
-    var userid = payload.sub;
+    var user_id = payload.sub;
     var email = payload.email;
     var displayName = payload.name;
 
-    var count = access_count.has(userid) ? access_count.get(userid) : 0;
-    access_count.set(userid, count + 1);
+    var count = access_count.has(user_id) ? access_count.get(user_id) : 0;
+    access_count.set(user_id, count + 1);
 
     return {
       body: {
@@ -372,6 +431,13 @@ class Closed {}
 type GroupStatus = {
   status: Open | Closed;
   owner: string;
+  members: Array<string>;
+};
+
+type User = {
+  name: string;
+  email: string;
+  groups: Array<string>;
 };
 
 let group_status = ccfapp.typedKv(
@@ -380,18 +446,24 @@ let group_status = ccfapp.typedKv(
   ccfapp.json<GroupStatus>()
 );
 
+let user_groups = ccfapp.typedKv(
+  "user_groups",
+  ccfapp.string,
+  ccfapp.json<User>()
+);
+
 function fresh_group(owner: string): string {
   var id = random_id();
   while (group_status.has(id)) {
     id = random_id();
   }
-  group_status.set(id, { status: new Open(), owner: owner });
+  group_status.set(id, { status: new Open(), owner: owner, members: [] });
   return id;
 }
 
 export function create_jwt(request: ccfapp.Request): ccfapp.Response {
   return check_jwt(request, function (jwt: ccfapp.JwtAuthnIdentity, params) {
-    var id = random_id();
+    var id = fresh_group(jwt.jwt.payload.sub);
     return {
       body: {
         group: id,
@@ -408,12 +480,46 @@ export function join(request: ccfapp.Request): ccfapp.Response {
   return {};
 }
 
+function get_or_default_user(
+  user_id: string,
+  email: string,
+  displayName: string
+) {
+  if (!user_groups.has(user_id)) {
+    return { name: displayName, email: email, groups: [] };
+  }
+  return user_groups.get(user_id);
+}
+
+type UserDisplay = { name: string; email: string };
+
 export function join_jwt(request: ccfapp.Request): ccfapp.Response {
   return check_jwt(request, function (jwt: ccfapp.JwtAuthnIdentity, params) {
+    var payload = jwt.jwt.payload;
+    var user_id = payload.sub;
+    var email = payload.email;
+    var displayName = payload.name;
+    let user = get_or_default_user(user_id, email, displayName);
+
+    let group_id = params.group_id;
+    let group = group_status.get(group_id);
+
+    group.members.push(user_id);
+    user.groups.push(group_id);
+
+    group_status.set(group_id, group);
+    user_groups.set(user_id, user);
+
+    var result = { group: group_id, members: new Array<UserDisplay>() };
+    for (var i in group.members) {
+      let uid = group.members[i];
+      let show_user = uid == user_id ? user : user_groups.get(uid);
+      let user_display = { name: show_user.name, email: show_user.email };
+      result.members.push(user_display);
+    }
+
     return {
-      body: {
-        group: params.group_id,
-      },
+      body: result,
       statusCode: 200,
       headers: {
         "content-type": "application/json",
