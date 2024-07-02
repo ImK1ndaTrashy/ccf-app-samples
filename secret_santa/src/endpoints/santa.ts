@@ -214,6 +214,8 @@ ${html}
       const headers = new Headers();
       const bearer = "Bearer " + accessToken;
 
+      console.log("Calling CCF with token: " + bearer);
+
       headers.append("Authorization", bearer);
 
       const options = {
@@ -292,7 +294,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
   }
 
   function createLink(id) {
-    navigator.clipboard.writeText("Link:" + id);
+    navigator.clipboard.writeText("https://localhost:8000/join/" + id);
   }
 
   async function seeProfile() {
@@ -373,7 +375,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
       welcomeDiv.innerHTML = "Welcome to Secret Santa";
 
       createGroupButton.hidden = false;
-      //seeProfile();
+      seeProfile();
       updateUI(
         {groups: [
           {

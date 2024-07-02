@@ -57,7 +57,7 @@ pip install -q ccf==$(cat /opt/ccf_virtual/share/VERSION)
 # Generic variables
 ##############################################
 app_dir=$PWD                    # application folder for reference
-root_dir=`dirname $PWD`         # root (parent) folder 
+root_dir=$(dirname "$PWD")         # root (parent) folder 
 server="https://${nodeAddress}" # ccf network address
 
 
@@ -67,32 +67,32 @@ server="https://${nodeAddress}" # ccf network address
 # . member0 cert/key was already copied to $certs
 ##############################################
 echo "Getting list of members..."
-curl $server/gov/members --cacert $certs/service_cert.pem | jq
+curl "$server"/gov/members --cacert "$certs"/service_cert.pem | jq
 
 curl "${server}/gov/ack/update_state_digest" \
     -X POST \
-    --cacert $certs/service_cert.pem \
-    --key $certs/member0_privk.pem \
-    --cert $certs/member0_cert.pem \
-    --silent | jq > $certs/activation.json
+    --cacert "$certs"/service_cert.pem \
+    --key "$certs"/member0_privk.pem \
+    --cert "$certs"/member0_cert.pem \
+    --silent | jq > "$certs"/activation.json
 
 echo "Show digest"
-cat $certs/activation.json
+cat "$certs"/activation.json
 
 ccf_prefix=/opt/ccf_virtual/bin
 
 ccf_cose_sign1 --ccf-gov-msg-type ack \
-               --ccf-gov-msg-created_at `date -uIs` \
-               --signing-key $certs/member0_privk.pem \
-               --signing-cert $certs/member0_cert.pem \
-               --content $certs/activation.json | \
+               --ccf-gov-msg-created_at $(date -uIs) \
+               --signing-key "$certs"/member0_privk.pem \
+               --signing-cert "$certs"/member0_cert.pem \
+               --content "$certs"/activation.json | \
                curl -s "${server}/gov/ack" \
-               --cacert $certs/service_cert.pem \
+               --cacert "$certs"/service_cert.pem \
                --header "Content-Type: application/cose" \
                --data-binary @-
 
 echo "Getting list of members..."
-curl ${server}/gov/members --cacert $certs/service_cert.pem | jq
+curl "${server}"/gov/members --cacert "$certs"/service_cert.pem | jq
 
 
 ##############################################
@@ -103,69 +103,69 @@ curl ${server}/gov/members --cacert $certs/service_cert.pem | jq
 create_certificate(){
     local certName="$1"
     local certsFolder="$2"
-    cd $certsFolder
-    $ccf_prefix/keygenerator.sh --name $certName --gen-enc-key
+    cd "$certsFolder"
+    $ccf_prefix/keygenerator.sh --name "$certName" --gen-enc-key
     cd -
 }
 
 #---------------------
-echo "Adding Member 1/2: create certificate and proposal"
-cert_name="member1"
-create_certificate "${cert_name}" "${certs}"
-$root_dir/scripts/add_member.sh --cert-file $certs/${cert_name}_cert.pem --pubk-file $certs/${cert_name}_enc_pubk.pem
+# echo "Adding Member 1/2: create certificate and proposal"
+# cert_name="member1"
+# create_certificate "${cert_name}" "${certs}"
+# "$root_dir"/scripts/add_member.sh --cert-file "$certs"/${cert_name}_cert.pem --pubk-file "$certs"/${cert_name}_enc_pubk.pem
 
-echo "Adding Member 2/2: submit proposal to network and vote as accepted"
-$root_dir/scripts/submit_proposal.sh --network-url ${server} \
- --proposal-file "$certs/set_member.json" \
- --certificate_dir $certs
+# echo "Adding Member 2/2: submit proposal to network and vote as accepted"
+# "$root_dir"/scripts/submit_proposal.sh --network-url "${server}" \
+#  --proposal-file "$certs/set_member.json" \
+#  --certificate_dir "$certs"
 
 
 #---------------------
-echo "Adding user0 1/2: create certificate and proposal"
-cert_name="user0" 
-create_certificate "${cert_name}" "${certs}"
-$root_dir/scripts/add_user.sh --cert-file $certs/${cert_name}_cert.pem
+# echo "Adding user0 1/2: create certificate and proposal"
+# cert_name="user0" 
+# create_certificate "${cert_name}" "${certs}"
+# "$root_dir"/scripts/add_user.sh --cert-file "$certs"/${cert_name}_cert.pem
 
-echo "Adding user0 2/2: submit proposal to network and vote as accepted"
-$root_dir/scripts/submit_proposal.sh --network-url ${server} \
- --proposal-file "$certs/set_user.json" \
- --certificate_dir $certs
+# echo "Adding user0 2/2: submit proposal to network and vote as accepted"
+# "$root_dir"/scripts/submit_proposal.sh --network-url "${server}" \
+#  --proposal-file "$certs/set_user.json" \
+#  --certificate_dir "$certs"
 
 
 ##############################################
 # Propose and Open Network
 ##############################################
-create_open_network_proposal(){
-    local certsFolder="$1"
-    local service_cert=$(< ${certsFolder}/service_cert.pem sed '$!G' | paste -sd '\\n' -)
+# create_open_network_proposal(){
+#     local certsFolder="$1"
+#     local service_cert=$(< "${certsFolder}"/service_cert.pem sed '$!G' | paste -sd '\\n' -)
 
-    local proposalFileName="${certsFolder}/network_open_proposal.json"
-    cat <<JSON > $proposalFileName
-{
-  "actions": [
-    {
-      "name": "transition_service_to_open",
-      "args": {
-        "next_service_identity": "${service_cert}\n"
-      }
-    }
-  ]
-}
-JSON
-}
+#     local proposalFileName="${certsFolder}/network_open_proposal.json"
+#     cat <<JSON > "$proposalFileName"
+# {
+#   "actions": [
+#     {
+#       "name": "transition_service_to_open",
+#       "args": {
+#         "next_service_identity": "${service_cert}\n"
+#       }
+#     }
+#   ]
+# }
+# JSON
+# }
 
-echo "Opening Network 1/2: create proposal"
-create_open_network_proposal "${certs}"
+# echo "Opening Network 1/2: create proposal"
+# create_open_network_proposal "${certs}"
 
-echo "Opening Network 2/2: submit proposal to network and vote as accepted"
-$root_dir/scripts/submit_proposal.sh --network-url ${server} \
- --proposal-file "$certs/network_open_proposal.json" \
- --certificate_dir $certs
+# echo "Opening Network 2/2: submit proposal to network and vote as accepted"
+# "$root_dir"/scripts/submit_proposal.sh --network-url "${server}" \
+#  --proposal-file "$certs/network_open_proposal.json" \
+#  --certificate_dir "$certs"
 
 ##############################################
 # Test Network
 ##############################################
-curl "${server}/node/network" --cacert $certs/service_cert.pem | jq
+# curl "${server}/node/network" --cacert "$certs"/service_cert.pem | jq
 
 ##############################################
 # Propose application. The json file we use
@@ -173,9 +173,22 @@ curl "${server}/node/network" --cacert $certs/service_cert.pem | jq
 # the application as it has all the endpoints
 # defined in it.
 ##############################################
-echo "Proposing Application 1/1: submit proposal to network and vote as accepted"
-$root_dir/scripts/submit_proposal.sh --network-url ${server} \
- --proposal-file "${app_dir}/dist/set_js_app.json" \
- --certificate_dir $certs
+# echo "Proposing Application 1/1: submit proposal to network and vote as accepted"
+# "$root_dir"/scripts/submit_proposal.sh --network-url "${server}" \
+#  --proposal-file "${app_dir}/dist/set_js_app.json" \
+#  --certificate_dir "$certs"
+
+##############
+## Add JWT
+echo "Proposing use of JWT for auth 1/2: submit set_ca_cert_bundle proposal to network"
+"$root_dir"/scripts/submit_proposal.sh --network-url "${server}" \
+ --proposal-file "${app_dir}/proposal1.json" \
+ --certificate_dir "$certs"
+
+echo "Proposing use of JWT for auth 2/2: submit set_jwt_issuer for microsoft auth"
+"$root_dir"/scripts/submit_proposal.sh --network-url "${server}" \
+ --proposal-file "${app_dir}/proposal2.json" \
+ --certificate_dir "$certs"
+
 
 
