@@ -66,13 +66,35 @@ function page_template(javascript, html) {
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
   integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="SHORTCUT ICON" href="https://c.s-microsoft.com/favicon.ico?v2" type="image/x-icon">
+<style> 
+.bg-santa {
+  background-color: #850101;
+}
+</style>
 </head>
+<style>
+.btn-secondarybutton {
+  background-color: #ff000d;;
+}
 
+.btn-secondarybutton:hover {
+  background-color: #c41212;
+  border-color: #a81414;
+
+  }.btn-primarybutton {
+  background-color: #ff000d;;
+}
+
+.btn-primarybutton:hover {
+  background-color: #c41212;
+  border-color: #a81414;
+}
+  </style>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-santa">
   <a class="navbar-brand" href="/">Confidential Secret Santa</a>
   <div class="btn-group ml-auto dropleft">
-    <button id="CreateGroup" class="btn btn-primary" id="createGroup" onclick="createGroup()" hidden="true">
+    <button id="CreateGroup" class="btn btn-secondarybutton" id="createGroup" onclick="createGroup()" hidden="true">
       Create Group
     </button>
     <button type="button" id="SignIn" class="btn btn-secondary" onclick="signIn()">
@@ -287,7 +309,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         memberEntry.innerHTML = member.name + " (" + member.email + ")" + (member.buying ? " <-- buy for" : "");
         groupP.appendChild(memberLI);
       }
-      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primary' onclick='createLink(this.id)'>Copy Link</button>";
+      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='createLink(this.id)'>Copy Link</button>";
       new_body.appendChild(groupCard);
     }
     cardDiv.appendChild(new_body);
@@ -330,7 +352,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         function updateUI(data, endpoint) {
           const name = document.createElement("p");
           name.id = "p-" + data.group;
-          name.innerHTML = "<strong>Group: </strong>" + data.group + "<button class='btn btn-primary' id='" + data.group + "' onclick='joinGroup(this.id)'>Join Group</button>";
+          name.innerHTML = "<strong>Group: </strong>" + data.group + "<button class='btn btn-primarybutton' id='" + data.group + "' onclick='joinGroup(this.id)'>Join Group</button>";
           profileDiv.appendChild(name);
         }
   
