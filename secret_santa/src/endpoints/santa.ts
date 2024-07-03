@@ -68,54 +68,48 @@ function page_template(javascript, html) {
 <link rel="SHORTCUT ICON" href="https://c.s-microsoft.com/favicon.ico?v2" type="image/x-icon">
 <style>
   .bg-santa {
-    background-color: #ff0000;
+    background-color: #850101;
+  }
+
+  .btn-secondarybutton {
+    background-color: #ff000d;;
+  }
+
+  .btn-secondarybutton:hover {
+    background-color: #c41212;
+    border-color: #a81414;
+  }
+
+  .btn-primarybutton {
+    background-color: #ff000d;;
+  }
+
+  .btn-primarybutton:hover {
+    background-color: #c41212;
+    border-color: #a81414;
+  }
+
+  body  {
+    background-image: url("https://static.vecteezy.com/system/resources/previews/013/682/519/original/seamless-pattern-with-christmas-candy-cane-caramel-and-snowflakes-endless-background-repeating-texture-vector.jpg");
+    background-color: #cccccc;
+    background-size: 35%;
+  }
+
+  .footer{ 
+    position: fixed;     
+    text-align: center;    
+    bottom: 0px; 
+    width: 100%;
+    background-color: rgba(255,255,255,0.9);
+  }  
+
+  .cardsanta {
+    background-color: rgba(255,255,255,0.9);
   }
 </style>
 </head>
-<style> 
-.bg-santa {
-  background-color: #850101;
-}
-.btn-secondarybutton {
-  background-color: #ff000d;;
-}
-
-.btn-secondarybutton:hover {
-  background-color: #c41212;
-  border-color: #a81414;
-
-  }.btn-primarybutton {
-  background-color: #ff000d;;
-}
-
-.btn-primarybutton:hover {
-  background-color: #c41212;
-  border-color: #a81414;
-}
-  body  {
-  background-image: url("https://static.vecteezy.com/system/resources/previews/013/682/519/original/seamless-pattern-with-christmas-candy-cane-caramel-and-snowflakes-endless-background-repeating-texture-vector.jpg");
-  background-color: #cccccc;
-    background-size: 35%;
-}
-  </style>
-   <head>
- <style type ="text/css" >
-   .footer{ 
-       position: fixed;     
-       text-align: center;    
-       bottom: 0px; 
-       width: 100%;
-       background-color: rgba(255,255,255,0.9);
-   }  
-</style>
-</head>
 <body>
-<<<<<<< Updated upstream
-    <div class="footer">Credits: Seb</div>
-</body>
-<body>
-=======
->>>>>>> Stashed changes
+<div class="footer">Credits: Seb</div>
 <nav class="navbar navbar-expand-lg navbar-dark bg-santa">
   <a class="navbar-brand" href="/">Confidential Secret Santa</a>
   <div class="btn-group ml-auto dropleft">
@@ -130,9 +124,6 @@ function page_template(javascript, html) {
 <br>
 <div class="santabackground">
 ${html}
-</div>
-<div class="credits"> 
-Credits: Seb
 </div>
 <!-- importing bootstrap.js and supporting js libraries -->
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -317,23 +308,30 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
 
   async function updateUI(data) {
     const new_body = document.createElement("p");
-    new_body.id = 'ffee33';
     for (var i in data.groups) {
       var group = data.groups[i];
       var groupCard = document.createElement("div");
       groupCard.className = "cardsanta text-left";
       var groupP = document.createElement("div");
+      var groupTable = document.createElement("table");
       groupP.className = "card-body";
+      // Hard coded group id for now
+      groupTable.id = 'ffee33';
+      groupCard.appendChild(groupTable);
       groupCard.appendChild(groupP);
 
       for (var j in group.members) {
-        var memberLI = document.createElement("li");
+        var memberRow = document.createElement("tr");
+        var memberName = document.createElement("td");
+        var memberMatch = document.createElement("td");
         var member = group.members[j];
-        var memberEntry = memberLI;
-        memberEntry.innerHTML = member.name;
-        groupP.appendChild(memberLI);
+        memberName.innerHTML = member.name;
+        memberMatch.innerHTML = "unassigned";
+        memberRow.appendChild(memberName);
+        memberRow.appendChild(memberMatch);
+        groupTable.appendChild(memberRow);
       }
-      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='generate(this.id)'>Copy Link</button>";
+      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='generate(this.id)'>Generate</button>";
       new_body.appendChild(groupCard);
     }
     cardDiv.appendChild(new_body);
@@ -345,9 +343,14 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
 
   async function generate() {
     const group = document.getElementById("ffee33");
-    var message = document.createElement("p");
-    message.innerHTML = "Don't press this button.";
-    group.appendChild(message);
+    var names = [];
+    for (var i = 0; i < group.children.length; i++) {
+      names.push(group.children[i].children[0].innerHTML);
+    }
+
+    for (var i = 0; i < group.children.length; i++) {
+      group.children[i].children[1].innerHTML = names[(i + 1) % names.length];
+    }
   }
 
   async function seeProfile() {
