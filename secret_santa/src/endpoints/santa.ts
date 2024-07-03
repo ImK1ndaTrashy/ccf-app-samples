@@ -66,13 +66,11 @@ function page_template(javascript, html) {
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
   integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="SHORTCUT ICON" href="https://c.s-microsoft.com/favicon.ico?v2" type="image/x-icon">
+</head>
 <style> 
 .bg-santa {
   background-color: #850101;
 }
-</style>
-</head>
-<style>
 .btn-secondarybutton {
   background-color: #ff000d;;
 }
@@ -89,7 +87,26 @@ function page_template(javascript, html) {
   background-color: #c41212;
   border-color: #a81414;
 }
+  body  {
+  background-image: url("https://static.vecteezy.com/system/resources/previews/013/682/519/original/seamless-pattern-with-christmas-candy-cane-caramel-and-snowflakes-endless-background-repeating-texture-vector.jpg");
+  background-color: #cccccc;
+    background-size: 35%;
+}
   </style>
+   <head>
+ <style type ="text/css" >
+   .footer{ 
+       position: fixed;     
+       text-align: center;    
+       bottom: 0px; 
+       width: 100%;
+       background-color: rgba(255,255,255,0.9);
+   }  
+</style>
+</head>
+<body>
+    <div class="footer">Credits: Seb</div>
+</body>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-santa">
   <a class="navbar-brand" href="/">Confidential Secret Santa</a>
@@ -103,8 +120,12 @@ function page_template(javascript, html) {
   </div>
 </nav>
 <br>
+<div class="santabackground">
 ${html}
-
+</div>
+<div class="credits"> 
+Credits: Seb
+</div>
 <!-- importing bootstrap.js and supporting js libraries -->
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
   integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
@@ -269,7 +290,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
   const html = `
 <div class="row" style="margin:auto">
   <div id="card-div" class="col-md-3" style="display:none">
-    <div class="card text-left">
+    <div class="cardsanta text-left">
       <div class="card-body">
         <h5 class="card-title" id="WelcomeMessage">Please sign-in to register and see who you should buy a gift for.</h5>
         <div id="profile-div"><p/></div>
@@ -291,7 +312,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
     for (var i in data.groups) {
       var group = data.groups[i];
       var groupCard = document.createElement("div");
-      groupCard.className = "card text-left";
+      groupCard.className = "cardsanta text-left";
       var groupP = document.createElement("div");
       groupP.className = "card-body";
       groupCard.appendChild(groupP);
