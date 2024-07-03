@@ -341,6 +341,10 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
     navigator.clipboard.writeText("https://localhost:8000/join/" + id);
   }
 
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+
   async function generate() {
     const generate_button = document.getElementById("generate_button");
     generate_button.innerHTML = "Generating...";
@@ -361,7 +365,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
       for (let i = names.length - 1; i > 0; i--)
       {
         const j = getRandomInt(i+1)
-        if (matchs[j] ==i)
+        if (matchs[j] == i)
           // This is what will reset the code if someone gets their own name.
           // The restart was created earlier near the start of the code.
           continue restart;
@@ -369,7 +373,8 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         matchs[i] = matchs[j]
         matchs[j] = tmp
       }
-    } while (matchs[0] == 0)
+      if (matchs[0] != 0) break;
+    } while (true)
     
     for (var i = 0; i < group.children.length; i++) {
         group.children[i].children[1].innerHTML = names[matchs[i]];
@@ -377,9 +382,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
 
     generate_button.innerHTML = "Generate";
   }
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
+
   async function seeProfile() {
     let ccfEndpoint = "https://localhost:8000/app/jwt";
 
