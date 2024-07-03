@@ -333,11 +333,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         memberEntry.innerHTML = member.name;
         groupP.appendChild(memberLI);
       }
-<<<<<<< Updated upstream
-      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='createLink(this.id)'>Copy Link</button>";
-=======
-      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primary' onclick='generate(this.id)'>Generate</button>";
->>>>>>> Stashed changes
+      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='generate(this.id)'>Copy Link</button>";
       new_body.appendChild(groupCard);
     }
     cardDiv.appendChild(new_body);
