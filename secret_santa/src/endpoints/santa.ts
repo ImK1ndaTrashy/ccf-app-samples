@@ -331,7 +331,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         memberRow.appendChild(memberMatch);
         groupTable.appendChild(memberRow);
       }
-      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='generate(this.id)'>Generate</button>";
+      groupP.innerHTML += "<br/><button id='generate_button' class='btn btn-primarybutton' onclick='generate()'>Generate</button>";
       new_body.appendChild(groupCard);
     }
     cardDiv.appendChild(new_body);
@@ -342,22 +342,24 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
   }
 
   async function generate() {
+    const generate_button = document.getElementById("generate_button");
+    generate_button.innerHTML = "Generating...";
     const group = document.getElementById("ffee33");
     var names = [];
     for (var i = 0; i < group.children.length; i++) {
       names.push(group.children[i].children[0].innerHTML);  
     }
-      restart:do {
-   // This is what adds elements to the end of the array.
-    var matchs = []
-    for (var a = 0;a<names.length;a++)
-    {
+    var matchs = [];
+    // This is what adds elements to the end of the array.
+    restart:do {
+      matchs = [];
+      for (var a = 0; a<names.length; a++)
+      {
         matchs.push(a) 
-    }
-    // We are using the Fisher–Yates shuffle. 'https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle'
-    for (let i = names.length - 1; i > 0;i--)
-    {
-
+      }
+      // We are using the Fisher–Yates shuffle. 'https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle'
+      for (let i = names.length - 1; i > 0; i--)
+      {
         const j = getRandomInt(i+1)
         if (matchs[j] ==i)
           // This is what will reset the code if someone gets their own name.
@@ -366,13 +368,14 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         const tmp = matchs[i]
         matchs[i] = matchs[j]
         matchs[j] = tmp
-    }
-        if(matchs[0] == 0)
-          continue restart;
-      }  while(false)
+      }
+    } while (matchs[0] == 0)
+    
     for (var i = 0; i < group.children.length; i++) {
-      group.children[i].children[1].innerHTML = names[matchs[i]];
+        group.children[i].children[1].innerHTML = names[matchs[i]];
     }
+
+    generate_button.innerHTML = "Generate";
   }
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
@@ -463,8 +466,8 @@ function getRandomInt(max) {
               {name: "Matt"},
               {name: "Adam"},
               {name: "Lisa"},
-               {name: "Lisas"},
-                {name: "Lisssa"},
+              {name: "Lisas"},
+              {name: "Lisssa"},
             ] 
           }
         ]});
