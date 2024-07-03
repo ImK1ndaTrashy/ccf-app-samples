@@ -66,6 +66,11 @@ function page_template(javascript, html) {
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
   integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="SHORTCUT ICON" href="https://c.s-microsoft.com/favicon.ico?v2" type="image/x-icon">
+<style>
+  .bg-santa {
+    background-color: #ff0000;
+  }
+</style>
 </head>
 <style> 
 .bg-santa {
@@ -105,9 +110,12 @@ function page_template(javascript, html) {
 </style>
 </head>
 <body>
+<<<<<<< Updated upstream
     <div class="footer">Credits: Seb</div>
 </body>
 <body>
+=======
+>>>>>>> Stashed changes
 <nav class="navbar navbar-expand-lg navbar-dark bg-santa">
   <a class="navbar-brand" href="/">Confidential Secret Santa</a>
   <div class="btn-group ml-auto dropleft">
@@ -309,6 +317,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
 
   async function updateUI(data) {
     const new_body = document.createElement("p");
+    new_body.id = 'ffee33';
     for (var i in data.groups) {
       var group = data.groups[i];
       var groupCard = document.createElement("div");
@@ -317,20 +326,18 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
       groupP.className = "card-body";
       groupCard.appendChild(groupP);
 
-      groupP.innerHTML = "<h5 class='card-title'>" + group.name + "</h5>";
       for (var j in group.members) {
         var memberLI = document.createElement("li");
         var member = group.members[j];
         var memberEntry = memberLI;
-        if (member.buying)
-        {
-          memberEntry = document.createElement("strong");
-          memberLI.appendChild(memberEntry);
-        }
-        memberEntry.innerHTML = member.name + " (" + member.email + ")" + (member.buying ? " <-- buy for" : "");
+        memberEntry.innerHTML = member.name;
         groupP.appendChild(memberLI);
       }
+<<<<<<< Updated upstream
       groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primarybutton' onclick='createLink(this.id)'>Copy Link</button>";
+=======
+      groupP.innerHTML += "<br/><button id='ffee33' class='btn btn-primary' onclick='generate(this.id)'>Generate</button>";
+>>>>>>> Stashed changes
       new_body.appendChild(groupCard);
     }
     cardDiv.appendChild(new_body);
@@ -338,6 +345,13 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
 
   function createLink(id) {
     navigator.clipboard.writeText("https://localhost:8000/join/" + id);
+  }
+
+  async function generate() {
+    const group = document.getElementById("ffee33");
+    var message = document.createElement("p");
+    message.innerHTML = "Don't press this button.";
+    group.appendChild(message);
   }
 
   async function seeProfile() {
@@ -389,7 +403,7 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
     const currentAcc = myMSALObj.getAccountByHomeId(accountId);
     if (currentAcc) {
       const response = await getTokenRedirect(loginRequest, currentAcc).catch(error => {
-          console.log(error);
+          console.log(error);  
       });
 
       function updateUI(data, endpoint) {
@@ -422,16 +436,11 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
       updateUI(
         {groups: [
           {
-            name: "Foo",
             members: [
-              {name: "Matt", email: "foo@bar", buying: false},
-              {name: "Adam", email: "bar@foo", buying: true},
-              {name: "Lisa", email: "cllr@foo", buying: false},
+              {name: "Matt"},
+              {name: "Adam"},
+              {name: "Lisa"},
             ] 
-          },
-          {
-            name: "Bar",
-            members: []
           }
         ]});
   }`;
