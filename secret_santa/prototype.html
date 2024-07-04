@@ -72,25 +72,8 @@
   <body>
     <div class="footer">Credits: Seb</div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-santa">
-      <a class="navbar-brand" href="/">Confidential Secret Santa</a>
+      <a class="navbar-brand" href="/">Confidential Secret Santa 🎅</a>
       <div class="btn-group ml-auto dropleft">
-        <button
-          id="CreateGroup"
-          class="btn btn-secondarybutton"
-          id="createGroup"
-          onclick="createGroup()"
-          hidden="true"
-        >
-          Create Group
-        </button>
-        <button
-          type="button"
-          id="SignIn"
-          class="btn btn-secondary"
-          onclick="signIn()"
-        >
-          Sign In
-        </button>
       </div>
     </nav>
     <br />
@@ -104,6 +87,23 @@
                 for.
               </h5>
               <div id="profile-div"><p /></div>
+              <div id="group-div">
+                <table > 
+                  <thead> <tr> <th> <b>Person:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ </b> </th><th><b>Buys for:</b></th></tr> </thead>
+                <tbody id = "groupTable"> </tbody>
+                </table>
+                <br/>
+                <button id='generate_button' class='btn btn-primarybutton' onclick='generate()'>Generate</button>
+                <button
+                id="CreateGroup"
+                class="btn btn-secondarybutton"
+                id="createGroup"
+                onclick="createGroup()"
+                hidden="true"
+              >
+                Add Name
+              </button> 
+              </div>
             </div>
           </div>
         </div>
@@ -176,7 +176,7 @@
       async function generate() {
         const generate_button = document.getElementById("generate_button");
         generate_button.innerHTML = "Generating...";
-        const group = document.getElementById("ffee33");
+        const group = document.getElementById("groupTable");
         var names = [];
         for (var i = 0; i < group.children.length; i++) {
           names.push(group.children[i].children[0].innerHTML);
@@ -208,27 +208,70 @@
 
         generate_button.innerHTML = "Generate";
       }
-
-      async function createGroup() {}
-
+            var getId = (function () {
+        var incrementingId = 0;
+        return function(element) {
+          if (!element.id) {
+            element.id = "id_" + incrementingId++;
+            // Possibly add a check if this ID really is unique
+          }
+          return element.id;
+        };
+      }());
+      function hide(id) {
+          var x = document.getElementById(id);
+            x.style.display = "none";
+        }
+      async function createGroup() {
+        const newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.className = "Group Name";
+        const createGroupButton = document.getElementById("CreateGroup");
+        cardDiv.appendChild(newInput);
+        createGroupButton.innerHTML = "Saving Group";
+        const newButton = document.createElement("button");
+        newButton.className = "btn btn-primarybutton";
+        newButton.innerHTML = "Submit Group";
+        getId (newButton);     
+        getId (newInput);     
+        newButton.onclick = function() {
+          const groupTable = document.getElementById("groupTable")
+          const tableRow = document.createElement("tr");
+          const tableElement = document.createElement("td");
+          const tableElement2 = document.createElement("td");
+          tableElement.innerHTML = newInput.value
+          tableElement2.innerHTML = "unassigned"
+          tableRow.appendChild (tableElement)
+          tableRow.appendChild (tableElement2)
+          groupTable.appendChild (tableRow) 
+          hide(newButton.id);
+          hide(newInput.id);
+        };
+        newInput.addEventListener("keypress", function(event) {
+          if (event.key === "Enter") {
+          event.preventDefault();
+          const groupTable = document.getElementById("groupTable")
+          const tableRow = document.createElement("tr");
+          const tableElement = document.createElement("td");
+          const tableElement2 = document.createElement("td");
+          tableElement.innerHTML = newInput.value
+          tableElement2.innerHTML = "unassigned"
+          tableRow.appendChild (tableElement)
+          tableRow.appendChild (tableElement2)
+          groupTable.appendChild (tableRow) 
+          hide(newButton.id);
+          hide(newInput.id);
+          }
+        });
+        cardDiv.appendChild(newButton);
+      
+        createGroupButton.innerHTML = "Add Name";
+      }
+      
       cardDiv.style.display = "initial";
       welcomeDiv.innerHTML = "Welcome to Secret Santa";
 
       createGroupButton.hidden = false;
-
-      updateUI({
-        groups: [
-          {
-            members: [
-              { name: "Matt" },
-              { name: "Adam" },
-              { name: "Lisa" },
-              { name: "Lisas" },
-              { name: "Lisssa" },
-            ],
-          },
-        ],
-      });
     </script>
   </body>
 </html>

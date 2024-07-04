@@ -466,11 +466,11 @@ export function homepage(request: ccfapp.Request): ccfapp.Response {
         {groups: [
           {
             members: [
-              {name: "Matt"},
-              {name: "Adam"},
-              {name: "Lisa"},
-              {name: "Lisas"},
-              {name: "Lisssa"},
+              {name: "Seb"},
+              {name: "Finn"},
+              {name: "Toby"},
+              {name: "Hannah"},
+              {name: "Phil"},
             ] 
           }
         ]});
