@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+    <title>Confidential Secret Santa</title>
+
+    <script
+      type="text/javascript"
+      src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"
+      integrity="sha384-DUSOaqAzlZRiZxkDi8hL7hXJDZ+X39ZOAYV9ZDx44gUv9pozmcunJH02tjSFLPnW"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- adding Bootstrap 4 for UI components  -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="SHORTCUT ICON"
+      href="https://c.s-microsoft.com/favicon.ico?v2"
+      type="image/x-icon"
+    />
+    <style>
+      .bg-santa {
+        background-color: #850101;
+      }
+
+      .btn-secondarybutton {
+        background-color: #ff000d;
+      }
+
+      .btn-secondarybutton:hover {
+        background-color: #c41212;
+        border-color: #a81414;
+      }
+
+      .btn-primarybutton {
+        background-color: #ff000d;
+      }
+
+      .btn-primarybutton:hover {
+        background-color: #c41212;
+        border-color: #a81414;
+      }
+
+      body {
+        background-image: url("https://static.vecteezy.com/system/resources/previews/013/682/519/original/seamless-pattern-with-christmas-candy-cane-caramel-and-snowflakes-endless-background-repeating-texture-vector.jpg");
+        background-color: #cccccc;
+        background-size: 35%;
+      }
+
+      .footer {
+        position: fixed;
+        text-align: center;
+        bottom: 0px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+
+      .cardsanta {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="footer">Credits: Seb</div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-santa">
+      <a class="navbar-brand" href="/">Confidential Secret Santa</a>
+      <div class="btn-group ml-auto dropleft">
+        <button
+          id="CreateGroup"
+          class="btn btn-secondarybutton"
+          id="createGroup"
+          onclick="createGroup()"
+          hidden="true"
+        >
+          Create Group
+        </button>
+        <button
+          type="button"
+          id="SignIn"
+          class="btn btn-secondary"
+          onclick="signIn()"
+        >
+          Sign In
+        </button>
+      </div>
+    </nav>
+    <br />
+    <div class="santabackground">
+      <div class="row" style="margin: auto">
+        <div id="card-div" class="col-md-3" style="display: none">
+          <div class="cardsanta text-left">
+            <div class="card-body">
+              <h5 class="card-title" id="WelcomeMessage">
+                Please sign-in to register and see who you should buy a gift
+                for.
+              </h5>
+              <div id="profile-div"><p /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- importing bootstrap.js and supporting js libraries -->
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- importing app scripts | load order is important -->
+    <script type="text/javascript">
+      const signInButton = document.getElementById("SignIn");
+
+      // Select DOM elements to work with
+      const welcomeDiv = document.getElementById("WelcomeMessage");
+      const cardDiv = document.getElementById("card-div");
+      const profileButton = document.getElementById("seeProfile");
+      const createGroupButton = document.getElementById("CreateGroup");
+      const profileDiv = document.getElementById("profile-div");
+
+      async function updateUI(data) {
+        const new_body = document.createElement("p");
+        for (var i in data.groups) {
+          var group = data.groups[i];
+          var groupCard = document.createElement("div");
+          groupCard.className = "cardsanta text-left";
+          var groupP = document.createElement("div");
+          var groupTable = document.createElement("table");
+          groupP.className = "card-body";
+          // Hard coded group id for now
+          groupTable.id = "ffee33";
+          groupCard.appendChild(groupTable);
+          groupCard.appendChild(groupP);
+
+          for (var j in group.members) {
+            var memberRow = document.createElement("tr");
+            var memberName = document.createElement("td");
+            var memberMatch = document.createElement("td");
+            var member = group.members[j];
+            memberName.innerHTML = member.name;
+            memberMatch.innerHTML = "unassigned";
+            memberRow.appendChild(memberName);
+            memberRow.appendChild(memberMatch);
+            groupTable.appendChild(memberRow);
+          }
+          groupP.innerHTML +=
+            "<br/><button id='generate_button' class='btn btn-primarybutton' onclick='generate()'>Generate</button>";
+          new_body.appendChild(groupCard);
+        }
+        cardDiv.appendChild(new_body);
+      }
+
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
+
+      async function generate() {
+        const generate_button = document.getElementById("generate_button");
+        generate_button.innerHTML = "Generating...";
+        const group = document.getElementById("ffee33");
+        var names = [];
+        for (var i = 0; i < group.children.length; i++) {
+          names.push(group.children[i].children[0].innerHTML);
+        }
+        var matchs = [];
+        // This is what adds elements to the end of the array.
+        restart: do {
+          matchs = [];
+          for (var a = 0; a < names.length; a++) {
+            matchs.push(a);
+          }
+          // We are using the Fisher–Yates shuffle. 'https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle'
+          for (let i = names.length - 1; i > 0; i--) {
+            const j = getRandomInt(i + 1);
+            if (matchs[j] == i)
+              // This is what will reset the code if someone gets their own name.
+              // The restart was created earlier near the start of the code.
+              continue restart;
+            const tmp = matchs[i];
+            matchs[i] = matchs[j];
+            matchs[j] = tmp;
+          }
+          if (matchs[0] != 0) break;
+        } while (true);
+
+        for (var i = 0; i < group.children.length; i++) {
+          group.children[i].children[1].innerHTML = names[matchs[i]];
+        }
+
+        generate_button.innerHTML = "Generate";
+      }
+
+      async function createGroup() {}
+
+      cardDiv.style.display = "initial";
+      welcomeDiv.innerHTML = "Welcome to Secret Santa";
+
+      createGroupButton.hidden = false;
+
+      updateUI({
+        groups: [
+          {
+            members: [
+              { name: "Matt" },
+              { name: "Adam" },
+              { name: "Lisa" },
+              { name: "Lisas" },
+              { name: "Lisssa" },
+            ],
+          },
+        ],
+      });
+    </script>
+  </body>
+</html>
