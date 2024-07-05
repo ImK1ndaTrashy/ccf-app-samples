@@ -79,7 +79,7 @@
     <br />
     <div class="santabackground">
       <div class="row" style="margin: auto">
-        <div id="card-div" class="col-md-3" style="display: none">
+        <div id="card-div" class="col-md-4" style="display: none">
           <div class="cardsanta text-left">
             <div class="card-body">
               <h5 class="card-title" id="WelcomeMessage">
@@ -89,7 +89,7 @@
               <div id="profile-div"><p /></div>
               <div id="group-div">
                 <table > 
-                  <thead> <tr> <th> <b>Person:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ </b> </th><th><b>Buys for:</b></th></tr> </thead>
+                  <thead> <tr> <th> <b>Person:‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ </b> </th><th><b>Buys for:‎ ‎ ‎ ‎ ‎ ‎</b></th></tr> </thead>
                 <tbody id = "groupTable"> </tbody>
                 </table>
                 <br/>
@@ -98,7 +98,7 @@
                 id="CreateGroup"
                 class="btn btn-secondarybutton"
                 id="createGroup"
-                onclick="createGroup()"
+                onclick="createGroup('')"
                 hidden="true"
               >
                 Add Name
@@ -137,38 +137,6 @@
       const createGroupButton = document.getElementById("CreateGroup");
       const profileDiv = document.getElementById("profile-div");
 
-      async function updateUI(data) {
-        const new_body = document.createElement("p");
-        for (var i in data.groups) {
-          var group = data.groups[i];
-          var groupCard = document.createElement("div");
-          groupCard.className = "cardsanta text-left";
-          var groupP = document.createElement("div");
-          var groupTable = document.createElement("table");
-          groupP.className = "card-body";
-          // Hard coded group id for now
-          groupTable.id = "ffee33";
-          groupCard.appendChild(groupTable);
-          groupCard.appendChild(groupP);
-
-          for (var j in group.members) {
-            var memberRow = document.createElement("tr");
-            var memberName = document.createElement("td");
-            var memberMatch = document.createElement("td");
-            var member = group.members[j];
-            memberName.innerHTML = member.name;
-            memberMatch.innerHTML = "unassigned";
-            memberRow.appendChild(memberName);
-            memberRow.appendChild(memberMatch);
-            groupTable.appendChild(memberRow);
-          }
-          groupP.innerHTML +=
-            "<br/><button id='generate_button' class='btn btn-primarybutton' onclick='generate()'>Generate</button>";
-          new_body.appendChild(groupCard);
-        }
-        cardDiv.appendChild(new_body);
-      }
-
       function getRandomInt(max) {
         return Math.floor(Math.random() * max);
       }
@@ -176,6 +144,7 @@
       async function generate() {
         const generate_button = document.getElementById("generate_button");
         generate_button.innerHTML = "Generating...";
+        alert("Your names have been paired successfully");
         const group = document.getElementById("groupTable");
         var names = [];
         for (var i = 0; i < group.children.length; i++) {
@@ -222,45 +191,51 @@
           var x = document.getElementById(id);
             x.style.display = "none";
         }
-      async function createGroup() {
+      async function createGroup(str) {
         const newInput = document.createElement("input");
         newInput.type = "text";
+        newInput.value = str;
         newInput.className = "Group Name";
         const createGroupButton = document.getElementById("CreateGroup");
         cardDiv.appendChild(newInput);
         createGroupButton.innerHTML = "Saving Group";
         const newButton = document.createElement("button");
         newButton.className = "btn btn-primarybutton";
-        newButton.innerHTML = "Submit Group";
-        getId (newButton);     
-        getId (newInput);     
-        newButton.onclick = function() {
+        newButton.innerHTML = "Submit First Name";
+
+        var action=function() {       
           const groupTable = document.getElementById("groupTable")
           const tableRow = document.createElement("tr");
           const tableElement = document.createElement("td");
           const tableElement2 = document.createElement("td");
+          const tableElement3 = document.createElement("td");
+          const tableElement4 = document.createElement("td");
           tableElement.innerHTML = newInput.value
           tableElement2.innerHTML = "unassigned"
+          tableElement3.innerHTML = "<b> (Delete) ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ </b>"
+          tableElement4.innerHTML = "<b> (Edit) </b>"
           tableRow.appendChild (tableElement)
           tableRow.appendChild (tableElement2)
+          tableRow.appendChild (tableElement3)
+          tableRow.appendChild (tableElement4)
           groupTable.appendChild (tableRow) 
           hide(newButton.id);
           hide(newInput.id);
+          var idcount = 0
+          tableElement3.setAttribute("onclick", "del_in(this);");
+          tableElement4.onclick = function() {
+            createGroup(tableElement.innerHTML);del_in(tableElement);
+          }
         };
+
+        getId (newButton);     
+        getId (newInput);     
+        newButton.onclick = action
+        
         newInput.addEventListener("keypress", function(event) {
           if (event.key === "Enter") {
           event.preventDefault();
-          const groupTable = document.getElementById("groupTable")
-          const tableRow = document.createElement("tr");
-          const tableElement = document.createElement("td");
-          const tableElement2 = document.createElement("td");
-          tableElement.innerHTML = newInput.value
-          tableElement2.innerHTML = "unassigned"
-          tableRow.appendChild (tableElement)
-          tableRow.appendChild (tableElement2)
-          groupTable.appendChild (tableRow) 
-          hide(newButton.id);
-          hide(newInput.id);
+          action()
           }
         });
         cardDiv.appendChild(newButton);
@@ -268,6 +243,10 @@
         createGroupButton.innerHTML = "Add Name";
       }
       
+      function del_in(e) {    
+              e.parentNode.remove();
+          }
+
       cardDiv.style.display = "initial";
       welcomeDiv.innerHTML = "Welcome to Secret Santa";
 
